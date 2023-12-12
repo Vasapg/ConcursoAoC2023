@@ -14,10 +14,8 @@ public class Springs
         BufferedReader reader = new BufferedReader(new FileReader(path));
         String line = reader.readLine();
         int result = 0;
-        while (line != null)
-        {
-            result += get_comb(line.trim().split(" ")[0], line.trim().split(" ")[1]);
-        }
+        result += get_comb(line.trim().split(" ")[0], line.trim().split(" ")[1]);
+        System.out.println(result);
     }
     
     public static int get_comb(String springs, String numbers)
@@ -26,13 +24,34 @@ public class Springs
         ArrayList<Integer> var = new ArrayList<>();
         int result = 0;
         for (String numb : numbers.trim().split(","))
-            rows.add(Integer.parseInt(numbers));
+            rows.add(Integer.parseInt(numb));
         for (int i = 0; i < springs.length() ; i++)
         {
             if (springs.toCharArray()[i] == '?')
                 var.add(i);
         }
-        recursive(springs, var, rows);
+        result = recursive(springs, var, rows, result);
+        return result;
+    }
+
+    public static int recursive(String springs, ArrayList<Integer> lengths, ArrayList<Integer> var, int result)
+    {
+        if (var.size() == 0)
+        {
+            if (check_chain(springs, lengths))
+            {
+                System.out.println(springs);
+                return result + 1;
+            }
+            else
+                return result;
+        }
+        String save = springs;
+        var.remove(0);
+        springs = springs.replaceFirst("\\?", "#");
+        System.out.println("replaced: " + springs);
+        result = recursive(springs, lengths, var, result);
+        result = recursive(save.replaceFirst("\\?", "."), lengths, var, result);
         return result;
     }
 
@@ -40,13 +59,13 @@ public class Springs
     {
         char []charArray = line.toCharArray();
         int j = 0;
-        for (int i = 0; i<numbers.size(); i++)
+        for (int i = 0; i<line.length(); i++)
         {
-            while (charArray[i] == '.')
+            while (i<numbers.size() && charArray[i] == '.')
                 i++;
             int limit = numbers.get(j++);
             int aux = 0;
-            while (charArray[i] != '.')
+            while (i<numbers.size() && charArray[i] != '.')
             {
                 aux++;
                 i++;
