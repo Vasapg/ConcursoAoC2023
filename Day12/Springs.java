@@ -10,11 +10,15 @@ public class Springs
 {
     public static void main(String[] args) throws IOException
     {
-        String path = "Day12/test1";
+        String path = "Day12/test2";
         BufferedReader reader = new BufferedReader(new FileReader(path));
         String line = reader.readLine();
         int result = 0;
-        result += get_comb(line.trim().split(" ")[0], line.trim().split(" ")[1]);
+        while (line != null)
+        {
+            result += get_comb(line.trim().split(" ")[0], line.trim().split(" ")[1]);
+            line = reader.readLine();
+        }
         System.out.println(result);
     }
     
@@ -30,13 +34,13 @@ public class Springs
             if (springs.toCharArray()[i] == '?')
                 var.add(i);
         }
-        result = recursive(springs, var, rows, result);
+        result = recursive(springs, rows, var.size(), result);
         return result;
     }
 
-    public static int recursive(String springs, ArrayList<Integer> lengths, ArrayList<Integer> var, int result)
+    public static int recursive(String springs, ArrayList<Integer> lengths, int var, int result)
     {
-        if (var.size() == 0)
+        if (var == 0)
         {
             if (check_chain(springs, lengths))
             {
@@ -47,11 +51,9 @@ public class Springs
                 return result;
         }
         String save = springs;
-        var.remove(0);
         springs = springs.replaceFirst("\\?", "#");
-        System.out.println("replaced: " + springs);
-        result = recursive(springs, lengths, var, result);
-        result = recursive(save.replaceFirst("\\?", "."), lengths, var, result);
+        result = recursive(springs, lengths, var - 1, result);
+        result = recursive(save.replaceFirst("\\?", "."), lengths, var - 1, result);
         return result;
     }
 
@@ -59,20 +61,36 @@ public class Springs
     {
         char []charArray = line.toCharArray();
         int j = 0;
-        for (int i = 0; i<line.length(); i++)
+        //System.out.println(line);
+        int i = 0;
+        while (i<line.length())
         {
-            while (i<numbers.size() && charArray[i] == '.')
+            while (i<line.length() && charArray[i] == '.')
                 i++;
             int limit = numbers.get(j++);
             int aux = 0;
-            while (i<numbers.size() && charArray[i] != '.')
+            //System.out.println("i: " + i + " char[i]: " + charArray[i]);
+            while (i < line.length() && charArray[i] != '.')
             {
                 aux++;
                 i++;
             }
+            //System.out.println("counted: " + aux + " required: " + limit);
             if (aux != limit)
                 return false;
+            if (j == numbers.size())
+            {
+                while (i<line.length())
+                {
+                    if (charArray[i] == '#')
+                        return false;
+                    i++;
+                }
+                return true;
+            }
         }
+        if (j != numbers.size())
+            return  false;
         return true;
     }
 }
